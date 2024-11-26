@@ -60,5 +60,16 @@ def create_user():
     return jsonify({"message": "Dados invalidos"}), 400
 
 
+@app.route("/user/<int:user_id>", methods=["GET"])
+@login_required
+def read_user(user_id):
+    user = User.query.get(user_id)
+
+    if user:
+        return jsonify({"username": user.username})
+
+    return jsonify({"message": "Usuario nao encontrado"}), 404
+
+
 if __name__ == "__main__":
     app.run(debug=True)
