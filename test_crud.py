@@ -34,6 +34,27 @@ def test_create_user():
     session.cookies.clear()
 
 
+def test_update_user():
+    user_payload = create_payload()
+    create_user_response = create_user(user_payload)
+    assert create_user_response.status_code == 200
+    user_id = create_user_response.json()["user_id"]
+
+    login_user_response = login_user(user_payload["username"], user_payload["password"])
+    assert login_user_response.status_code == 200
+    new_password = uuid()
+    update_user_response = update_user(user_id, new_password)
+    assert update_user_response.status_code == 200
+    update_user_data = update_user_response.json()
+    assert "user_id" in update_user_data
+    assert user_id == update_user_data["user_id"]
+
+    logout_user()
+    login_user_response = login_user(user_payload["username"], new_password)
+    assert login_user_response.status_code == 200
+    session.cookies.clear()
+
+
 def create_payload():
     return {
         "username": f"test_user_{uuid()}",
@@ -52,9 +73,12 @@ def login_user(username, password):
 
 
 def logout_user():
-    return requests.get(f"{url}/logout")
+    return session.get(f"{url}/logout")
 
 
 def read_user(user_id):
     return session.get(f"{url}/user/{user_id}")
 
+
+def update_user(user_id, new_password):
+    return session.put(f"{url}/user/{user_id}", json={"password": new_password})
