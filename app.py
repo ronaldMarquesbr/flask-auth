@@ -57,7 +57,10 @@ def create_user():
         db.session.add(user)
         db.session.commit()
 
-        return jsonify({"username": "Usuario cadastrado com sucesso"})
+        return jsonify({
+            "user_id": user.id,
+            "message": "Usuario cadastrado com sucesso"
+        })
 
     return jsonify({"message": "Dados invalidos"}), 400
 
